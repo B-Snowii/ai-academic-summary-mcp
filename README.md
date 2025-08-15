@@ -1,70 +1,76 @@
 # AI Paper Summary Pilot
 
-一个基于Gradio的AI论文摘要工具，支持PDF上传、智能分析和人性化输出。
+A Gradio-based AI paper summarization tool that supports PDF upload, intelligent analysis, and humanized output.
 
-## 功能特性
+## Features
 
-- 📄 **PDF文档处理**: 自动提取论文标题、摘要、关键词等关键信息
-- 🤖 **AI智能分析**: 使用Nebius API进行深度论文分析
-- 💬 **人性化输出**: 将AI回复转换为更自然、对话式的表达
-- 📊 **多类型支持**: 支持原因分析、框架模型、关联分析、结果总结等多种类型
-- 💾 **历史记录**: 保存对话历史，支持搜索和导出
-- 🎛️ **参数调节**: 可调节AI温度和top_p参数
+* 📄 **PDF Document Processing**: Automatically extracts key information such as paper title, abstract, keywords, etc.
+* 🤖 **AI Intelligent Analysis**: Uses Nebius API for deep paper analysis
+* 💬 **Humanized Output**: Converts AI responses into more natural, conversational expressions
+* 📊 **Multi-type Support**: Supports various analysis types including reason analysis, framework models, correlation analysis, and result summaries
+* 💾 **History Management**: Saves conversation history with search and export capabilities
+* 🎛️ **Parameter Adjustment**: Adjustable AI temperature and top_p parameters
 
-## 技术栈
+## Tech Stack
 
-- **前端**: Gradio
-- **AI模型**: Meta-Llama-3.1-70B-Instruct, DeepSeek-R1
-- **PDF处理**: PyMuPDF
-- **API**: Nebius AI
+* **Frontend**: Gradio
+* **AI Models**: Meta-Llama-3.1-70B-Instruct, DeepSeek-R1
+* **PDF Processing**: PyMuPDF
+* **API**: Nebius AI
 
-## 本地运行
+## Local Setup
 
-1. 克隆仓库：
+1. **Clone the repository**:
 ```bash
 git clone <your-repo-url>
 cd agentic_Ai_humanizer_mcp
 ```
 
-2. 安装依赖：
+2. **Install dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. 运行应用：
+3. **Run the application**:
 ```bash
 python app.py
 ```
 
-4. 访问应用：
-打开浏览器访问 `http://127.0.0.1:7870`
+4. **Access the app**: Open your browser and visit `http://127.0.0.1:7870`
 
-## 使用说明
+## Usage Instructions
 
-1. **上传PDF**: 点击"Upload a PDF"按钮上传论文文件
-2. **自动填充**: 点击"Fill from PDF"自动提取论文内容到查询框
-3. **选择类型**: 选择合适的分析类型（原因、框架、关联、结果）
-4. **调节参数**: 根据需要调整AI温度和top_p参数
-5. **人性化**: 勾选"Humanize AI response"获得更自然的输出
-6. **提交查询**: 点击"Submit"开始分析
+1. **Upload PDF**: Click "Upload a PDF" button to upload your paper file
+2. **Auto-fill**: Click "Fill from PDF" to automatically extract paper content to the query box
+3. **Select Type**: Choose appropriate analysis type (reason, framework, connection, result)
+4. **Adjust Parameters**: Modify AI temperature and top_p parameters as needed
+5. **Humanize**: Check "Humanize AI response" to get more natural output
+6. **Submit Query**: Click "Submit" to start analysis
 
-## 部署
+## Deployment
 
 ### Hugging Face Spaces
-本项目已配置为可在Hugging Face Spaces上直接部署。
 
-### 本地部署
-确保安装了所有依赖包，然后运行`python app.py`即可。
+This project is configured to be deployed directly on Hugging Face Spaces.
 
-## 许可证
+### Local Deployment
+
+Ensure all dependencies are installed, then run `python app.py`.
+
+## API Configuration
+
+The application uses Nebius AI API for processing. Make sure to configure your API keys in the application.
+
+## License
 
 MIT License
 
 ---
-license: mit
-language:
+
+**license**: mit  
+**language**: 
 - en
-- zh
-base_model:
+- zh  
+**base_model**:
 - deepseek-ai/DeepSeek-R1
 - meta-llama/Meta-Llama-3.1-70B-Instruct
