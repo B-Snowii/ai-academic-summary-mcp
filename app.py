@@ -867,10 +867,12 @@ if __name__ == "__main__":
         import os
         if os.environ.get("SPACE_ID"):
             print("Detected Hugging Face Spaces environment")
-            # Hugging Face Spaces deployment - use minimal configuration
+            # Hugging Face Spaces deployment - use environment variable for port
+            server_port = int(os.environ.get("GRADIO_SERVER_PORT", 7860))
+            print(f"Using port: {server_port}")
             demo.launch(
                 server_name="0.0.0.0",
-                server_port=7860,
+                server_port=server_port,
                 share=False,
                 debug=False,
                 show_error=True,

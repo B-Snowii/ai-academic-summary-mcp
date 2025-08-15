@@ -4,9 +4,11 @@ emoji: 📚
 colorFrom: blue
 colorTo: purple
 sdk: gradio
-sdk_version: 4.44.0
+sdk_version: 3.50.2
 app_file: app.py
 pinned: false
+env:
+  GRADIO_SERVER_PORT: 7860
 ---
 
 # AI Paper Summary Pilot
