@@ -1,3 +1,14 @@
+---
+title: AI Academic Paper Summarizer
+emoji: 📚
+colorFrom: blue
+colorTo: purple
+sdk: gradio
+sdk_version: 4.44.0
+app_file: app.py
+pinned: false
+---
+
 # AI Paper Summary Pilot
 
 A Gradio-based AI paper summarization tool that supports PDF upload, intelligent analysis, and humanized output.
@@ -18,26 +29,6 @@ A Gradio-based AI paper summarization tool that supports PDF upload, intelligent
 * **PDF Processing**: PyMuPDF
 * **API**: Nebius AI
 
-## Local Setup
-
-1. **Clone the repository**:
-```bash
-git clone <your-repo-url>
-cd agentic_Ai_humanizer_mcp
-```
-
-2. **Install dependencies**:
-```bash
-pip install -r requirements.txt
-```
-
-3. **Run the application**:
-```bash
-python app.py
-```
-
-4. **Access the app**: Open your browser and visit `http://127.0.0.1:7870`
-
 ## Usage Instructions
 
 1. **Upload PDF**: Click "Upload a PDF" button to upload your paper file
@@ -47,30 +38,6 @@ python app.py
 5. **Humanize**: Check "Humanize AI response" to get more natural output
 6. **Submit Query**: Click "Submit" to start analysis
 
-## Deployment
-
-### Hugging Face Spaces
-
-This project is configured to be deployed directly on Hugging Face Spaces.
-
-### Local Deployment
-
-Ensure all dependencies are installed, then run `python app.py`.
-
-## API Configuration
-
-The application uses Nebius AI API for processing. Make sure to configure your API keys in the application.
-
 ## License
 
 MIT License
-
----
-
-**license**: mit  
-**language**: 
-- en
-- zh  
-**base_model**:
-- deepseek-ai/DeepSeek-R1
-- meta-llama/Meta-Llama-3.1-70B-Instruct
