@@ -843,8 +843,15 @@ if __name__ == "__main__":
         # Check if running on Hugging Face Spaces
         import os
         if os.environ.get("SPACE_ID"):
-            # Hugging Face Spaces deployment - use minimal configuration
-            demo.launch()
+            # Hugging Face Spaces deployment - use specific configuration
+            demo.launch(
+                server_name="0.0.0.0",
+                server_port=7860,
+                share=False,
+                debug=False,
+                show_error=True,
+                inbrowser=False,
+            )
         else:
             # Local deployment
             demo.launch(
