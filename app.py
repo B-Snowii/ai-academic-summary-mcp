@@ -410,6 +410,15 @@ def call_nebius_api(query, context_data="", temperature: float | None = None, to
     try:
         system_prompt = "You are a helpful research assistant. Keep responses concise and accurate."
         user_content = f"{context_data}\n\n{query}" if context_data else query
+        
+        # Ensure temperature is a valid float
+        temp_value = 0.7
+        if temperature is not None:
+            try:
+                temp_value = float(temperature)
+            except (ValueError, TypeError):
+                temp_value = 0.7
+        
         nebius_payload = {
             "model": "meta-llama/Meta-Llama-3.1-70B-Instruct",
             "messages": [
@@ -417,10 +426,16 @@ def call_nebius_api(query, context_data="", temperature: float | None = None, to
                 {"role": "user", "content": user_content},
             ],
             "max_tokens": 1000,
-            "temperature": float(temperature) if temperature is not None else 0.7,
+            "temperature": temp_value,
         }
+        
+        # Ensure top_p is a valid float
         if top_p is not None:
-            nebius_payload["top_p"] = float(top_p)
+            try:
+                nebius_payload["top_p"] = float(top_p)
+            except (ValueError, TypeError):
+                pass  # Skip top_p if invalid
+        
         headers = {
             "Authorization": f"Bearer {NEBIUS_API_KEY}",
             "Content-Type": "application/json",
@@ -860,6 +875,8 @@ if __name__ == "__main__":
                 debug=False,
                 show_error=True,
                 inbrowser=False,
+                prevent_thread_lock=True,
+                show_api=False,
             )
         else:
             print("Running in local environment")
@@ -867,9 +884,10 @@ if __name__ == "__main__":
             demo.launch(
                 server_name="127.0.0.1",
                 server_port=7870,
-                share=False,
-                debug=True,
+                share=True,
+                debug=False,
                 show_error=True,
+                show_api=False,
             )
     except Exception as e:
         print(f"Error launching Gradio app: {e}")
@@ -879,7 +897,15 @@ if __name__ == "__main__":
         try:
             print("Attempting fallback launch...")
             demo = create_gradio_app()
-            demo.launch()
+            demo.launch(
+                server_name="0.0.0.0",
+                server_port=7860,
+                share=False,
+                debug=False,
+                show_error=True,
+                inbrowser=False,
+                prevent_thread_lock=True,
+            )
         except Exception as fallback_e:
             print(f"Fallback launch also failed: {fallback_e}")
             traceback.print_exc()
