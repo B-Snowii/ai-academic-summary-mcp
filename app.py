@@ -839,19 +839,22 @@ if __name__ == "__main__":
     try:
         demo = create_gradio_app()
         print("Gradio app created successfully")
-        demo.launch(
-            server_name="127.0.0.1",
-            server_port=7870,
-            share=False,
-            debug=True,
-            show_error=True,
-        )
+        
+        # Check if running on Hugging Face Spaces
+        import os
+        if os.environ.get("SPACE_ID"):
+            # Hugging Face Spaces deployment
+            demo.launch()
+        else:
+            # Local deployment
+            demo.launch(
+                server_name="127.0.0.1",
+                server_port=7870,
+                share=False,
+                debug=True,
+                show_error=True,
+            )
     except Exception as e:
         print(f"Error launching Gradio app: {e}")
         import traceback
         traceback.print_exc()
-
-# For Hugging Face Spaces deployment
-if __name__ == "__main__":
-    demo = create_gradio_app()
-    demo.launch()
