@@ -837,12 +837,21 @@ def create_gradio_app():
 if __name__ == "__main__":
     print("Starting Gradio Interface...")
     try:
+        # Test API connection first
+        print("Testing Nebius API connection...")
+        test_response = call_nebius_api("Hello", temperature=0.1)
+        if test_response.startswith("Error:"):
+            print(f"API Test failed: {test_response}")
+        else:
+            print("API connection successful")
+        
         demo = create_gradio_app()
         print("Gradio app created successfully")
         
         # Check if running on Hugging Face Spaces
         import os
         if os.environ.get("SPACE_ID"):
+            print("Detected Hugging Face Spaces environment")
             # Hugging Face Spaces deployment - use specific configuration
             demo.launch(
                 server_name="0.0.0.0",
@@ -853,6 +862,7 @@ if __name__ == "__main__":
                 inbrowser=False,
             )
         else:
+            print("Running in local environment")
             # Local deployment
             demo.launch(
                 server_name="127.0.0.1",
@@ -865,3 +875,11 @@ if __name__ == "__main__":
         print(f"Error launching Gradio app: {e}")
         import traceback
         traceback.print_exc()
+        # Fallback launch for Hugging Face Spaces
+        try:
+            print("Attempting fallback launch...")
+            demo = create_gradio_app()
+            demo.launch()
+        except Exception as fallback_e:
+            print(f"Fallback launch also failed: {fallback_e}")
+            traceback.print_exc()
