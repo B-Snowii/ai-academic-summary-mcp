@@ -844,7 +844,13 @@ if __name__ == "__main__":
         import os
         if os.environ.get("SPACE_ID"):
             # Hugging Face Spaces deployment
-            demo.launch()
+            demo.launch(
+                server_name="0.0.0.0",
+                server_port=7860,
+                share=False,
+                debug=False,
+                show_error=True,
+            )
         else:
             # Local deployment
             demo.launch(
