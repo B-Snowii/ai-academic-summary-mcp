@@ -1,4 +1,6 @@
-gradio
-requests
-fastapi
-uvicorn
+gradio>=4.0.0
+requests>=2.31.0
+PyMuPDF>=1.23.0
+fastapi>=0.104.0
+uvicorn>=0.24.0
+python-multipart>=0.0.6

@@ -6,192 +6,10 @@ import datetime
 import os
 import re
 import fitz  # PyMuPDF for PDF parsing
-from typing import Any, Dict, List, Optional, Tuple
 
 # Nebius API configuration (hardcoded)
 NEBIUS_API_URL = "https://api.studio.nebius.ai/v1/chat/completions"
 NEBIUS_API_KEY = "eyJhbGciOiJIUzI1NiIsImtpZCI6IlV6SXJWd1h0dnprLVRvdzlLZWstc0M1akptWXBvX1VaVkxUZlpnMDRlOFUiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJnb29nbGUtb2F1dGgyfDExMDkwNDYwNzI2NjMxOTY2NDYyMSIsInNjb3BlIjoib3BlbmlkIG9mZmxpbmVfYWNjZXNzIiwiaXNzIjoiYXBpX2tleV9pc3N1ZXIiLCJhdWQiOlsiaHR0cHM6Ly9uZWJpdXMtaW5mZXJlbmNlLmV1LmF1dGgwLmNvbS9hcGkvdjIvIl0sImV4cCI6MTkwNjc4ODk3OSwidXVpZCI6IjBiMDc5OGI4LTdkZjctNDcxMi05ZTY0LTZiNmU5OTk0OWRmNyIsIm5hbWUiOiJNQ1AgU0VSVkVSIiwiZXhwaXJlc19hdCI6IjIwMzAtMDYtMDRUMDc6MzY6MTkrMDAwMCJ9.-RG1eCxfuO9bqmTa00pHCAb6L47IWEFHVxq3xqHrjU8"
-
-# --- Database / Memory configuration ---
-DATABASE_PATH_DEFAULT = "database.json"
-DATABASE_FALLBACK_PATH = "json.json"
-_DB_CACHE: Dict[str, Any] = {}
-
-# Privacy protection - disable database loading in public deployments
-PRIVACY_MODE = os.environ.get("PRIVACY_MODE", "false").lower() == "true"
-
-
-def _normalize_type_label(label: str) -> List[str]:
-    """Normalize a raw type string into internal keys. Supports multi-label via ';', ',', '/'.
-    Returns a list of keys among: ['reason', 'framework', 'connection', 'result'] (deduped order-preserving).
-    """
-    if not label:
-        return []
-    raw = label.replace("|", ";").replace("/", ";").replace(",", ";")
-    parts = [p.strip().lower() for p in raw.split(";") if p.strip()]
-    keys: List[str] = []
-    for p in parts:
-        k = p
-        if any(w in p for w in ["reason", "phenomenon", "why", "mechanism", "drivers", "aversion"]):
-            k = "reason"
-        elif any(w in p for w in ["framework", "model", "formalize", "calibrated"]):
-            k = "framework"
-        elif any(w in p for w in ["connection", "affects", "impact", "influence", "association", "disconnect", "versus", "no effect"]):
-            k = "connection"
-        elif any(w in p for w in ["result", "introduce", "consequence", "lead to", "effects"]):
-            k = "result"
-        # allow typos
-        elif "conection" in p:
-            k = "connection"
-        elif "reasons" in p:
-            k = "reason"
-        if k not in keys:
-            keys.append(k)
-    return keys
-
-
-def _normalize_ui_choice(choice: str) -> Optional[str]:
-    c = (choice or "").strip().lower()
-    if c.startswith("reason"):
-        return "reason"
-    if c.startswith("framework") or c.startswith("model"):
-        return "framework"
-    if c.startswith("connection"):
-        return "connection"
-    if c.startswith("result"):
-        return "result"
-    return None
-
-
-def _ensure_database_loaded(path: Optional[str] = None) -> Dict[str, Any]:
-    global _DB_CACHE
-    if _DB_CACHE:
-        return _DB_CACHE
-    
-    # Privacy protection: skip database loading in public deployments
-    if PRIVACY_MODE:
-        _DB_CACHE = {"sources": [], "attempts": []}
-        return _DB_CACHE
-    
-    db_path = path or (DATABASE_PATH_DEFAULT if os.path.exists(DATABASE_PATH_DEFAULT) else DATABASE_FALLBACK_PATH)
-    if not os.path.exists(db_path):
-        _DB_CACHE = {"sources": [], "attempts": []}
-        return _DB_CACHE
-    try:
-        with open(db_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-    except Exception:
-        data = {"sources": [], "attempts": []}
-
-    sources: List[Dict[str, Any]] = data.get("sources", []) or []
-    attempts: List[Dict[str, Any]] = data.get("attempts", []) or []
-
-    # Build indices
-    id_to_source: Dict[str, Dict[str, Any]] = {}
-    for s in sources:
-        sid = str(s.get("id", "")).strip()
-        if not sid:
-            continue
-        s_types = _normalize_type_label(str(s.get("type", "")))
-        s["_norm_types"] = s_types
-        id_to_source[sid] = s
-
-    # Group attempts by source id
-    src_to_attempts: Dict[str, List[Dict[str, Any]]] = {sid: [] for sid in id_to_source}
-    for at in attempts:
-        used_ids = at.get("used_source_ids", []) or []
-        for sid in used_ids:
-            sid_s = str(sid)
-            if sid_s in id_to_source:
-                src_to_attempts.setdefault(sid_s, []).append(at)
-
-    # Build examples per type key
-    type_to_examples: Dict[str, List[Dict[str, str]]] = {}
-    for sid, src in id_to_source.items():
-        types = src.get("_norm_types", [])
-        if not types:
-            continue
-        # Prefer final_summary if exists, else last draft
-        final_text = None
-        drafts: List[Tuple[str, str]] = []  # (draft_summary, comments)
-        for at in src_to_attempts.get(sid, []):
-            if at.get("final_summary"):
-                final_text = at.get("final_summary")
-            if at.get("draft_summary") or at.get("comments"):
-                drafts.append((at.get("draft_summary", ""), "\n".join(at.get("comments", []) if isinstance(at.get("comments"), list) else [str(at.get("comments") or "")])))
-        if not final_text and drafts:
-            final_text = drafts[-1][0]
-        label = src.get("label", "")
-        evo_lines: List[str] = []
-        # Keep evolution concise
-        for i, (d, cmt) in enumerate(drafts[:4], start=1):
-            if d:
-                evo_lines.append(f"Draft v{i}: {d}")
-            if cmt:
-                evo_lines.append(f"Feedback v{i}: {cmt}")
-        if final_text:
-            evo_lines.append(f"Final: {final_text}")
-        evo_text = "\n".join(evo_lines).strip()
-        example = {"label": label, "final": final_text or "", "evolution": evo_text}
-        for t in types:
-            type_to_examples.setdefault(t, []).append(example)
-
-    _DB_CACHE = {
-        "raw": data,
-        "id_to_source": id_to_source,
-        "src_to_attempts": src_to_attempts,
-        "type_to_examples": type_to_examples,
-    }
-    return _DB_CACHE
-
-
-def _build_memory_examples_from_db(selected_types_ui: Optional[List[str]], k_per_type: int = 2) -> str:
-    """Assemble short examples from DB for the chosen types.
-    Falls back to empty string if DB unavailable.
-    """
-    db = _ensure_database_loaded()
-    if not db or not db.get("type_to_examples"):
-        return ""
-    # Normalize UI choices to internal keys
-    keys: List[str] = []
-    for ch in (selected_types_ui or []):
-        nk = _normalize_ui_choice(ch)
-        if nk and nk not in keys:
-            keys.append(nk)
-    if not keys:
-        keys = ["connection"]  # default
-
-    lines: List[str] = []
-    for key in keys:
-        examples = (db["type_to_examples"].get(key) or [])[:k_per_type]
-        for ex in examples:
-            if ex.get("final"):
-                lines.append(f"- [{key}] {ex.get('final')}")
-    return "\n".join(lines).strip()
-
-
-def _build_cot_like_memory(selected_types_ui: Optional[List[str]], k_sources: int = 1) -> str:
-    """Build a CoT-like learning context: show draft->feedback->final evolutions for similar types.
-    Keep concise. No hidden chain-of-thought is requested from the model; this is explicit training data.
-    """
-    db = _ensure_database_loaded()
-    if not db or not db.get("type_to_examples"):
-        return ""
-    keys: List[str] = []
-    for ch in (selected_types_ui or []):
-        nk = _normalize_ui_choice(ch)
-        if nk and nk not in keys:
-            keys.append(nk)
-    if not keys:
-        keys = ["connection"]
-    blocks: List[str] = []
-    for key in keys:
-        examples = (db["type_to_examples"].get(key) or [])[:k_sources]
-        for ex in examples:
-            evo = ex.get("evolution", "")
-            if evo:
-                blocks.append(f"[Type: {key}] {ex.get('label','')}:\n{evo}")
-    return "\n\n".join(blocks).strip()
 
 # --- MCP Protocol Support ---
 def mcp_supported_call(payload, endpoint, headers):
@@ -408,17 +226,15 @@ def build_query_from_fields(fields: dict, file_name: str = "") -> str:
 
 def call_nebius_api(query, context_data="", temperature: float | None = None, top_p: float | None = None):
     try:
-        system_prompt = "You are a helpful research assistant. Keep responses concise and accurate."
-        user_content = f"{context_data}\n\n{query}" if context_data else query
         nebius_payload = {
             "model": "meta-llama/Meta-Llama-3.1-70B-Instruct",
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_content},
-            ],
+            "messages": [{"role": "user", "content": query}],
             "max_tokens": 1000,
-            "temperature": float(temperature) if temperature is not None else 0.7,
         }
+        if temperature is not None:
+            nebius_payload["temperature"] = float(temperature)
+        else:
+            nebius_payload["temperature"] = 0.7
         if top_p is not None:
             nebius_payload["top_p"] = float(top_p)
         headers = {
@@ -598,18 +414,8 @@ def generate_short_summary(base_text: str, few_shots=None) -> str:
             examples = few_shots.strip()
         else:
             examples = _fallback_fewshots_by_type(base_text)
-        # Augment with memory from DB (type-prior examples + CoT-like evolution glimpses)
-        memory_snippets = _build_memory_examples_from_db(few_shots if isinstance(few_shots, list) else None)
-        memory_cot = _build_cot_like_memory(few_shots if isinstance(few_shots, list) else None)
-        memory_block = ""
-        if memory_snippets:
-            memory_block += f"Type-prior exemplars (concise):\n{memory_snippets}\n\n"
-        if memory_cot:
-            memory_block += f"Learning traces (draft→feedback→final):\n{memory_cot}\n\n"
         prompt = (
             f"{prefix}Few-shot examples (style and brevity to mimic):\n{examples}\n\n"
-            f"Use the following memory to improve conciseness, structure, and faithfulness. "
-            f"Do NOT copy verbatim; treat it as guidance.\n{memory_block}"
             f"Model Answer:\n{base_text}"
         )
         return call_nebius_api(prompt)
@@ -775,12 +581,12 @@ def create_gradio_app():
                     value=False,
                     info="Enable this to make the AI response sound more natural and conversational",
                 )
-                # Type selector (labels without a/b/c/d)
+                # Few-shot selector (labels without a/b/c/d)
                 fewshot_choices = gr.CheckboxGroup(
-                    label="Type",
+                    label="Few-shot examples for short summary (select one or more)",
                     choices=[
-                        "reason",
-                        "framework",
+                        "reason/phenomenon",
+                        "framework/model",
                         "connection",
                         "result",
                     ],
@@ -850,8 +656,3 @@ if __name__ == "__main__":
         print(f"Error launching Gradio app: {e}")
         import traceback
         traceback.print_exc()
-
-# For Hugging Face Spaces deployment
-if __name__ == "__main__":
-    demo = create_gradio_app()
-    demo.launch()

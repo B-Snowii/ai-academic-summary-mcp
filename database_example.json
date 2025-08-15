@@ -1,0 +1,18 @@
+{
+  "sources": [
+    {
+      "id": "example_001",
+      "label": "Example Research Paper",
+      "type": "connection",
+      "_norm_types": ["connection"]
+    }
+  ],
+  "attempts": [
+    {
+      "used_source_ids": ["example_001"],
+      "draft_summary": "This is an example draft summary for demonstration purposes.",
+      "final_summary": "This is an example final summary for demonstration purposes.",
+      "comments": ["Example feedback comment"]
+    }
+  ]
+}

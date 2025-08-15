@@ -1,0 +1,28 @@
+++++++++++++++++++++++++++++++++++++++++++++
+title: Global Investors, Hidden Suppliers: How Institutions Shape the Impact of Stock Market Liberalization Programs on Corporate Responsibility
+v1: Using China’s stock market liberalization programs—which remove restrictions on global investors in domestic markets—as natural experiments, this paper examines the impact of these programs on the corporate responsibility of emerging-market firms by analyzing changes in their supplier identity (?) disclosure practices.
+comments:(1)our readers can understand market liberalization so this is no need to explain it (2)so the study is not limited to Chinese firms?(3)their supplier identity (?)
+v2: Focusing on emerging-market firms in China, this paper investigates how stock market liberalization programs influence these firms' volutary disclosure of supplier identity - a informative source for investors to identify  'clean' and social responsible firms.
+comments:(1)China itself is a emerging market, what do you mean (2)identity is a source?
+v3: Using variables to measure China firms' supplier identity disclosure - an informative source for investors seeking environmentally responsible firms, this paper challenges previous assumptions about the relationship between stock market liberalization programs and corporate responsibility, and highlights the role of institutional factors.
+
+title: The Dark Side of Patience: The Case of Stock Price Crashes
+v1:Using a sample of 462,830 public firms across 41 countries, this paper separately examines the impact of country-level and firm-level patience on the risk of corporate stock price crash.
+comments: (1)(how is patience defined in the context of firm? When deciding whether to include a explanation of certain term or not, try to think it as, without the explanation, are you able to understand what they are talking about?)(2) And the academic writing here should be improved, as "separately examine sth" is not as good as "examine sth and sth respectively".
+v2: Using a sample of 462,830 public firms across 41 countries, this paper defines long-termism  as patience and examines how country-level and firm-level patience respectively affect the risk of corporate stock price crash.
+comments: (1)long-termism (in what?)(2) respectively (wrong place of word, use AI to refine writing)
+v3: Using a sample of 462,830 public firms across 41 countries, this paper investigates the impact of both country-level and firm-level patience - defined as long-term orientation and willingness to delay gratification - on the risk of corporate stock price crash
+
+title: Conflicting Incentives: How the Inevitable Disclosure Doctrine Disparately Influences Disclosure
+v1:Given that the adoption of the Inevitable Disclosure Doctrine restricts labor market mobility by limiting workers' ability to join competing firms, this paper investigates the opposing effects of this reduced mobilityon U.S. firms' financial disclosure.
+comments:  (so the empirical test is mobility-> disclosure instead of IDD -> disclosure?)
+v2: This paper investigates the opposing effects of adopting Inevitable Disclosure Doctrine on U.S. firms' earnings management, as such adoption reduces workers' mobility in labor market by preventing them from joining competing firms.
+comments: the opposing effects (?)
+v3: This paper highlights opposing effects of the Inevitable Disclosure Doctrine adoption on U.S. firms' earnings management, as such adoption reduces workers' mobility in labor market by preventing them from joining competing firms. #because the effect could be positive and negative
+
+title:Forward-looking CEOs and Corporate Environmental Performance: Evidence from a Machine Learning Approach
+v1:Analyzing the linguistic content of U.S. CEOs' conference calls, this paper constructs a forward-looking orientation index to measure how CEOs weight long-term considerations  over short-term ones, and examines its relationship with corporate environmental performance. 
+comments: (1)can't you just call it textual analysis? "linguistic content" is not even a usual term, for conference call, it should be "transcript",right? (2)what is consideration?
+v2: Analyzing the linguistic patterns of U.S. CEOs' earnings conference calls , this paper constructs a forward-looking orientation index to measure how CEOs weight long-term outcomes over short-term ones, and examines its relationship with corporate environmental performance.
+comments:(1)earning call itself is a word(2)long-term outcomes (?)
+v3: Analyzing the linguistic patterns in U.S. CEOs' earnings calls, this paper constructs a forward-looking orientation index to measure how CEOs prioritize future environmental benefits over immediate costs, and examines its relationship with corporate environmental performance.
