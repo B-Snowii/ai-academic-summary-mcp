@@ -1,0 +1,27 @@
+
+{
+  "sources": [
+    {
+      "id": "S15",
+      "label": "Sample Title",
+      "type": "paper",
+      "content": "Sample content (abstract or full text)."
+    },
+    {
+      "id": "S16",
+      "label": "...",
+      "type": "connection",
+      "content": "..."
+    }
+  ],
+  "attempts": [
+    {
+      "attempt_id": "S15-A1",
+      "task_id": "T_your_task_id",
+      "used_source_ids": ["S15"],
+      "draft_summary": "Sample draft summary",
+      "comments": ["Optional comment"],
+      "final_summary": "Optional final summary"
+    }
+  ]
+}
